@@ -40,6 +40,3 @@
 ;; fetches the team tricode from the JSON response
 (defun fetch-team (game team)
   (assoc-default team game))
-
-
-(print-buffer
