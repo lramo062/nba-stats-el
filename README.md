@@ -4,7 +4,8 @@ An emacs package that fetches realtime NBA scores within Emacs.
 Nba.com does not have a public API for fetching realtime scores, and is pretty challenging to scrape 
 but with a-little bit of snooping through the websites' XMLHttpRequest I found their call to the internal API.
 
-Here's a screen shot:
+![Alt text] (https://github.com/lramo062/emacs-nba-scores/blob/master/Screenshot%20from%202016-12-19%2011-48-46.png)
+![Alt text](https://github.com/lramo062/emacs-nba-scores/blob/master/Screenshot%20from%202016-12-19%2011-48-26.png "Here's a screen shot:")
 
 
 ## Getting Started
