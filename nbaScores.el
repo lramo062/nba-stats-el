@@ -41,4 +41,4 @@
 (defun fetch-team (game team)
   (assoc-default team game))
 
-(provied 'nbaScores.el)
+(provide 'nbaScores)
