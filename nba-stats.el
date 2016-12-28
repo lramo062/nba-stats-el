@@ -142,6 +142,5 @@ Lists the player names (as DATA) & stat-value depending on Stat-Type (as STAT-TY
 
 
 
-(provide 'nbaScores)
-;;; nbaScores.el ENDS HERE
-
+(provide 'nba-stats)
+;;; nba-stats.el ends here
