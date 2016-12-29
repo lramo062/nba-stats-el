@@ -70,7 +70,7 @@
              (lambda (&key data &allow-other-keys)
                (with-output-to-temp-buffer "*nba-scores*"
                  (fetch-games (assoc-default 'games data))
-                  (switch-to-buffer "*nba-scores*"))))
+                 (switch-to-buffer "*nba-scores*"))))
    :error (message "Error Making HTTP Request")))
 
 
@@ -79,14 +79,14 @@
   "Prints team name and score for each game (as GAMES)."
   (seq-doseq (x games)
     (print (format-message "%s: %s\n %s: %s"
-             ;; Home Team Name
-             (assoc-default 'triCode (fetch-team x 'hTeam))
-             ;; Home Team Score
-             (sum-score (assoc-default 'linescore (fetch-team x 'hTeam)))
-             ;; Visiting Team Name
-              (assoc-default 'triCode (fetch-team x 'vTeam))
-             ;; Visiting Team Score
-             (sum-score (assoc-default 'linescore (fetch-team x 'vTeam)))))))
+                           ;; Home Team Name
+                           (assoc-default 'triCode (fetch-team x 'hTeam))
+                           ;; Home Team Score
+                           (sum-score (assoc-default 'linescore (fetch-team x 'hTeam)))
+                           ;; Visiting Team Name
+                           (assoc-default 'triCode (fetch-team x 'vTeam))
+                           ;; Visiting Team Score
+                           (sum-score (assoc-default 'linescore (fetch-team x 'vTeam)))))))
 
 
 
@@ -127,7 +127,7 @@
           ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made: %S" (funcall type x 'FG3M))))
           ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made: %S" (funcall type x 'FTM))))
           ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points: %S" (funcall type x 'FANTASY_POINTS))))
-           ((equal "Fantasy Points Per Game" (assoc-default 'title x)) (print (format-message "Fantasy Points Per Game: %S" (funcall type x 'FANTASY_POINTS))))
+          ((equal "Fantasy Points Per Game" (assoc-default 'title x)) (print (format-message "Fantasy Points Per Game: %S" (funcall type x 'FANTASY_POINTS))))
           ((equal "Field Goal Percentage" (assoc-default 'title x)) (print (format-message "Field Goal Percentage: %S" (funcall type x 'FG_PCT))))
           ((equal "Three Point Percentage" (assoc-default 'title x)) (print (format-message "Three Point Percentage: %S" (funcall type x 'FG3_PCT))))
           ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage: %S" (funcall type x 'FT_PCT)))))))
