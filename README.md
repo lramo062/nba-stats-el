@@ -27,7 +27,6 @@ Clone https://github.com/lramo062/nba-scores-stats and require nbaScores.el in y
 
 ## Todo
 
-* Fetching season leaderboards for players/teams
 * Fetching individual player/team stats given the player/team name
 
 ## Contributing
