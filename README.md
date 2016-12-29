@@ -12,7 +12,8 @@ but with a-little bit of snooping through the websites' XMLHttpRequest I found t
 
 * Include nba-stats.el in your .emacs. 
 * Run M-x nba-scores, then enter desired date for scores (YYYYMMDD)
-* Run M-x nba-player-stats to fetch player stats
+* Run M-x nba-daily-player to fetch daily player leaderboards
+* Run M-x nba-daily-team to fetch team player leaderboards
 
 ### Prerequisites
 
@@ -23,6 +24,11 @@ Depends on request.el & json.el
 
 Clone https://github.com/lramo062/nba-scores-stats and require nbaScores.el in your .emacs
 
+
+## Todo
+
+* Fetching season leaderboards for players/teams
+* Fetching individual player/team stats given the player/team name
 
 ## Contributing
 
