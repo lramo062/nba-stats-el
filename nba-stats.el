@@ -105,7 +105,7 @@
 ;; NBA Player Stats ------------------------------------------------------------
 
 
-(defun nba-player-stats ()
+(defun nba-player-leaderboards ()
   "Return all the leading players & stat with respect to the stat-type."
   (interactive)
   (request
@@ -115,7 +115,7 @@
    :success (cl-function
              (lambda (&key data &allow-other-keys)
                (with-output-to-temp-buffer "*nba-player-stats*"
-                 (get-player-stats (assoc-default 'items (aref (assoc-default 'items data) 0))))
+                 (get-player-leaderboards (assoc-default 'items (aref (assoc-default 'items data) 0))))
                (switch-to-buffer "*nba-player-stats*")))
    :error (message "Error Making HTTP Request")))
 
@@ -127,7 +127,7 @@ Lists the player names (as DATA) & stat-value depending on Stat-Type (as STAT-TY
         collect (list (assoc-default 'PLAYER_NAME x) (assoc-default stat-type x))))
 
 
-(defun get-player-stats (data)
+(defun get-player-leaderboards (data)
   "Prints the most recent NBA player's stats (as DATA) along with the player name."
   (seq-doseq (x (append data nil))
     (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (list-stats x 'PTS))))
