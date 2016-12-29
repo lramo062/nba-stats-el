@@ -57,7 +57,7 @@
 
 ;;; Code:
 
-;; NBA Scores ------------------------------------------------------------------
+;; NBA Game Scores ------------------------------------------------------------------
 
 (defun nba-scores (date)
   "Return the NBA Scores for a given Date (as DATE)."
@@ -102,11 +102,11 @@
 
 
 
-;; NBA Player Stats ------------------------------------------------------------
+;; NBA Daily Player Leaderboards ------------------------------------------------------------
 
 
-(defun nba-player-leaderboards ()
-  "Return all the leading players & stat with respect to the stat-type."
+(defun nba-daily-player ()
+  "Return all the daily leading player stats with respect to the stat-type."
   (interactive)
   (request
    "http://stats.nba.com/js/data/widgets/home_daily.json"
@@ -115,30 +115,58 @@
    :success (cl-function
              (lambda (&key data &allow-other-keys)
                (with-output-to-temp-buffer "*nba-player-stats*"
-                 (get-player-leaderboards (assoc-default 'items (aref (assoc-default 'items data) 0))))
+                 (get-daily-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-daily-player-stats))
                (switch-to-buffer "*nba-player-stats*")))
    :error (message "Error Making HTTP Request")))
 
 
-(defun list-stats (data stat-type)
+(defun list-daily-player-stats (data stat-type)
   "Helper function to get-player-stats.
 Lists the player names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
   (loop for x in (append (assoc-default 'playerstats data) nil)
         collect (list (assoc-default 'PLAYER_NAME x) (assoc-default stat-type x))))
 
 
-(defun get-player-leaderboards (data)
-  "Prints the most recent NBA player's stats (as DATA) along with the player name."
+(defun get-daily-data (data type)
+  "Fetches the daily stats (as DATA) depending on either team/palyer stats (as TYPE)."
   (seq-doseq (x (append data nil))
-    (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (list-stats x 'PTS))))
-          ((equal "Rebounds" (assoc-default 'title x)) (print (format-message "Rebounds: %S" (list-stats x 'REB))))
-          ((equal "Assists" (assoc-default 'title x)) (print (format-message "Assists: %S" (list-stats x 'AST))))
-          ((equal "Blocks" (assoc-default 'title x)) (print (format-message "Blocks: %S" (list-stats x 'BLK))))
-          ((equal "Steals" (assoc-default 'title x)) (print (format-message "Steals: %S" (list-stats x 'STL))))
-          ((equal "Turnovers" (assoc-default 'title x)) (print (format-message "Turnovers: %S" (list-stats x 'TOV))))
-          ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made %S" (list-stats x 'FG3M))))
-          ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made %S" (list-stats x 'FTM))))
-          ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points %S" (list-stats x 'FANTASY_POINTS)))))))
+    (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (funcall type x 'PTS))))
+          ((equal "Rebounds" (assoc-default 'title x)) (print (format-message "Rebounds: %S" (funcall type x 'REB))))
+          ((equal "Assists" (assoc-default 'title x)) (print (format-message "Assists: %S" (funcall type x 'AST))))
+          ((equal "Blocks" (assoc-default 'title x)) (print (format-message "Blocks: %S" (funcall type x 'BLK))))
+          ((equal "Steals" (assoc-default 'title x)) (print (format-message "Steals: %S" (funcall type x 'STL))))
+          ((equal "Turnovers" (assoc-default 'title x)) (print (format-message "Turnovers: %S" (funcall type x 'TOV))))
+          ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made %S" (funcall type x 'FG3M))))
+          ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made %S" (funcall type x 'FTM))))
+          ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points %S" (funcall type x 'FANTASY_POINTS))))
+          ((equal "Field Goal Percentage" (assoc-default 'title x)) (print (format-message "Field Goal Percentage %S" (funcall type x 'FANTASY_POINTS))))
+          ((equal "Three Point Percentage" (assoc-default 'title x)) (print (format-message "Three Point Percentage %S" (funcall type x 'FANTASY_POINTS))))
+          ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage %S" (funcall type x 'FANTASY_POINTS)))))))
+
+
+;; NBA Daily Team Leaderboards ------------------------------------------------------------
+
+
+(defun list-daily-team-stats (data stat-type)
+  "Helper function to get-daily-team-stats.
+Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
+  (loop for x in (append (assoc-default 'teamstats data) nil)
+        collect (list (concat (assoc-default 'TEAM_CITY x) " " (assoc-default 'TEAM_NAME x)) (assoc-default stat-type x))))
+
+
+(defun nba-daily-team ()
+  "Return all the daily leading team stats with respect to the stat-type."
+  (interactive)
+  (request
+   "http://stats.nba.com/js/data/widgets/home_daily.json"
+   :type "GET"
+   :parser 'json-read
+   :success (cl-function
+             (lambda (&key data &allow-other-keys)
+               (with-output-to-temp-buffer "*nba-player-stats*"
+                 (get-daily-data (assoc-default 'items (aref (assoc-default 'items data) 1)) 'list-daily-team-stats))
+               (switch-to-buffer "*nba-player-stats*")))
+   :error (message "Error Making HTTP Request")))
 
 
 
