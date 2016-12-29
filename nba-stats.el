@@ -46,7 +46,7 @@
 ;; M-x nba-scores
 ;; M-x nba-player-stats
 
-;;; TODO:
+;;; TODO: Query for individual player/team season stats
 
 ;;; Code:
 
@@ -102,7 +102,41 @@
 
 
 
-;; NBA Daily Player Leaderboards ------------------------------------------------------------
+;; NBA Daily Player/Team Leaderboards ------------------------------------------------------------
+
+
+;; This function is used by both the list-daily-player-stats & list-daily-team-stats to
+;; fetch the stats. Argument type is actually the name of one of the two functions and will
+;; be called with funcall. 
+(defun get-daily-data (data type)
+  "Fetches the daily stats (as DATA) depending on either team/palyer stats (as TYPE)."
+  (seq-doseq (x (append data nil))
+    (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (funcall type x 'PTS))))
+          ((equal "Rebounds" (assoc-default 'title x)) (print (format-message "Rebounds: %S" (funcall type x 'REB))))
+          ((equal "Assists" (assoc-default 'title x)) (print (format-message "Assists: %S" (funcall type x 'AST))))
+          ((equal "Blocks" (assoc-default 'title x)) (print (format-message "Blocks: %S" (funcall type x 'BLK))))
+          ((equal "Steals" (assoc-default 'title x)) (print (format-message "Steals: %S" (funcall type x 'STL))))
+          ((equal "Turnovers" (assoc-default 'title x)) (print (format-message "Turnovers: %S" (funcall type x 'TOV))))
+          ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made %S" (funcall type x 'FG3M))))
+          ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made %S" (funcall type x 'FTM))))
+          ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points %S" (funcall type x 'FANTASY_POINTS))))
+          ((equal "Field Goal Percentage" (assoc-default 'title x)) (print (format-message "Field Goal Percentage %S" (funcall type x 'FG_PCT))))
+          ((equal "Three Point Percentage" (assoc-default 'title x)) (print (format-message "Three Point Percentage %S" (funcall type x 'FG3_PCT))))
+          ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage %S" (funcall type x 'FT_PCT)))))))
+
+
+(defun list-daily-player-stats (data stat-type)
+  "Helper function to get-daily-player-stats.
+Lists the player names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
+  (loop for x in (append (assoc-default 'playerstats data) nil)
+        collect (list (assoc-default 'PLAYER_NAME x) (assoc-default stat-type x))))
+
+
+(defun list-daily-team-stats (data stat-type)
+  "Helper function to get-daily-team-stats.
+Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
+  (loop for x in (append (assoc-default 'teamstats data) nil)
+        collect (list (concat (assoc-default 'TEAM_CITY x) " " (assoc-default 'TEAM_NAME x)) (assoc-default stat-type x))))
 
 
 (defun nba-daily-player ()
@@ -118,40 +152,6 @@
                  (get-daily-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-daily-player-stats))
                (switch-to-buffer "*nba-player-stats*")))
    :error (message "Error Making HTTP Request")))
-
-
-(defun list-daily-player-stats (data stat-type)
-  "Helper function to get-player-stats.
-Lists the player names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
-  (loop for x in (append (assoc-default 'playerstats data) nil)
-        collect (list (assoc-default 'PLAYER_NAME x) (assoc-default stat-type x))))
-
-
-(defun get-daily-data (data type)
-  "Fetches the daily stats (as DATA) depending on either team/palyer stats (as TYPE)."
-  (seq-doseq (x (append data nil))
-    (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (funcall type x 'PTS))))
-          ((equal "Rebounds" (assoc-default 'title x)) (print (format-message "Rebounds: %S" (funcall type x 'REB))))
-          ((equal "Assists" (assoc-default 'title x)) (print (format-message "Assists: %S" (funcall type x 'AST))))
-          ((equal "Blocks" (assoc-default 'title x)) (print (format-message "Blocks: %S" (funcall type x 'BLK))))
-          ((equal "Steals" (assoc-default 'title x)) (print (format-message "Steals: %S" (funcall type x 'STL))))
-          ((equal "Turnovers" (assoc-default 'title x)) (print (format-message "Turnovers: %S" (funcall type x 'TOV))))
-          ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made %S" (funcall type x 'FG3M))))
-          ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made %S" (funcall type x 'FTM))))
-          ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points %S" (funcall type x 'FANTASY_POINTS))))
-          ((equal "Field Goal Percentage" (assoc-default 'title x)) (print (format-message "Field Goal Percentage %S" (funcall type x 'FANTASY_POINTS))))
-          ((equal "Three Point Percentage" (assoc-default 'title x)) (print (format-message "Three Point Percentage %S" (funcall type x 'FANTASY_POINTS))))
-          ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage %S" (funcall type x 'FANTASY_POINTS)))))))
-
-
-;; NBA Daily Team Leaderboards ------------------------------------------------------------
-
-
-(defun list-daily-team-stats (data stat-type)
-  "Helper function to get-daily-team-stats.
-Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
-  (loop for x in (append (assoc-default 'teamstats data) nil)
-        collect (list (concat (assoc-default 'TEAM_CITY x) " " (assoc-default 'TEAM_NAME x)) (assoc-default stat-type x))))
 
 
 (defun nba-daily-team ()
