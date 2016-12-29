@@ -108,7 +108,7 @@
 ;; This function is used by both the list-daily-player-stats & list-daily-team-stats to
 ;; fetch the stats. Argument type is actually the name of one of the two functions and will
 ;; be called with funcall. 
-(defun get-daily-data (data type)
+(defun get-data (data type)
   "Fetches the daily stats (as DATA) depending on either team/palyer stats (as TYPE)."
   (seq-doseq (x (append data nil))
     (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (funcall type x 'PTS))))
@@ -125,14 +125,14 @@
           ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage %S" (funcall type x 'FT_PCT)))))))
 
 
-(defun list-daily-player-stats (data stat-type)
+(defun list-player-stats (data stat-type)
   "Helper function to get-daily-player-stats.
 Lists the player names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
   (loop for x in (append (assoc-default 'playerstats data) nil)
         collect (list (assoc-default 'PLAYER_NAME x) (assoc-default stat-type x))))
 
 
-(defun list-daily-team-stats (data stat-type)
+(defun list-team-stats (data stat-type)
   "Helper function to get-daily-team-stats.
 Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE)."
   (loop for x in (append (assoc-default 'teamstats data) nil)
@@ -148,9 +148,8 @@ Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE
    :parser 'json-read
    :success (cl-function
              (lambda (&key data &allow-other-keys)
-               (with-output-to-temp-buffer "*nba-player-stats*"
-                 (get-daily-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-daily-player-stats))
-               (switch-to-buffer "*nba-player-stats*")))
+               (with-output-to-temp-buffer "*nba-daily-player-stats*"
+                 (get-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-player-stats))))
    :error (message "Error Making HTTP Request")))
 
 
@@ -163,10 +162,25 @@ Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE
    :parser 'json-read
    :success (cl-function
              (lambda (&key data &allow-other-keys)
-               (with-output-to-temp-buffer "*nba-player-stats*"
-                 (get-daily-data (assoc-default 'items (aref (assoc-default 'items data) 1)) 'list-daily-team-stats))
-               (switch-to-buffer "*nba-player-stats*")))
+               (with-output-to-temp-buffer "*nba-daily-team-stats*"
+                 (get-data (assoc-default 'items (aref (assoc-default 'items data) 1)) 'list-team-stats))))
    :error (message "Error Making HTTP Request")))
+
+
+
+(defun nba-season-player ()
+  "Return all the season leading player stats with respect to the stat-type."
+  (interactive)
+  (request
+   "http://stats.nba.com/js/data/widgets/home_season.json"
+   :type "GET"
+   :parser 'json-read
+   :success (cl-function
+             (lambda (&key data &allow-other-keys)
+               (with-output-to-temp-buffer "*nba-season-player-stats*"
+                 (get-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-player-stats))))
+   :error (message "Error Making HTTP Request")))
+
 
 
 
