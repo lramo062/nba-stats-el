@@ -104,25 +104,33 @@
 
 ;; NBA Daily Player/Team Leaderboards ------------------------------------------------------------
 
-
-;; This function is used by both the list-daily-player-stats & list-daily-team-stats to
-;; fetch the stats. Argument type is actually the name of one of the two functions and will
+;; NBA JSON is structured the same for both season/daily & player/team stats so this
+;; function works with the JSON arrays and checks the object properties as the condition to
+;; call the correct function.
+;; Used by both the list-player-stats & list-team-stats to
+;; fetch the stats. Argument TYPE is actually the name of one of the two above functions and will
 ;; be called with funcall. 
 (defun get-data (data type)
   "Fetches the daily stats (as DATA) depending on either team/palyer stats (as TYPE)."
   (seq-doseq (x (append data nil))
     (cond ((equal "Points" (assoc-default 'title x)) (print (format-message "Points: %S" (funcall type x 'PTS))))
+          ((equal "Points Per Game" (assoc-default 'title x)) (print (format-message "Points Per Game: %S" (funcall type x 'PTS))))
           ((equal "Rebounds" (assoc-default 'title x)) (print (format-message "Rebounds: %S" (funcall type x 'REB))))
+          ((equal "Rebounds Per Game" (assoc-default 'title x)) (print (format-message "Rebounds Per Game: %S" (funcall type x 'REB))))
           ((equal "Assists" (assoc-default 'title x)) (print (format-message "Assists: %S" (funcall type x 'AST))))
+          ((equal "Assists Per Game" (assoc-default 'title x)) (print (format-message "Assists Per Game: %S" (funcall type x 'AST))))
           ((equal "Blocks" (assoc-default 'title x)) (print (format-message "Blocks: %S" (funcall type x 'BLK))))
+          ((equal "Blocks Per Game" (assoc-default 'title x)) (print (format-message "Blocks Per Game: %S" (funcall type x 'BLK))))
           ((equal "Steals" (assoc-default 'title x)) (print (format-message "Steals: %S" (funcall type x 'STL))))
+          ((equal "Steals Per Game" (assoc-default 'title x)) (print (format-message "Steals Per Game: %S" (funcall type x 'STL))))
           ((equal "Turnovers" (assoc-default 'title x)) (print (format-message "Turnovers: %S" (funcall type x 'TOV))))
-          ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made %S" (funcall type x 'FG3M))))
-          ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made %S" (funcall type x 'FTM))))
-          ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points %S" (funcall type x 'FANTASY_POINTS))))
-          ((equal "Field Goal Percentage" (assoc-default 'title x)) (print (format-message "Field Goal Percentage %S" (funcall type x 'FG_PCT))))
-          ((equal "Three Point Percentage" (assoc-default 'title x)) (print (format-message "Three Point Percentage %S" (funcall type x 'FG3_PCT))))
-          ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage %S" (funcall type x 'FT_PCT)))))))
+          ((equal "Three Pointers Made" (assoc-default 'title x)) (print (format-message "Three Pointers Made: %S" (funcall type x 'FG3M))))
+          ((equal "Free Throws Made" (assoc-default 'title x)) (print (format-message "Free Throws Made: %S" (funcall type x 'FTM))))
+          ((equal "Fantasy Points" (assoc-default 'title x)) (print (format-message "Fantasy Points: %S" (funcall type x 'FANTASY_POINTS))))
+           ((equal "Fantasy Points Per Game" (assoc-default 'title x)) (print (format-message "Fantasy Points Per Game: %S" (funcall type x 'FANTASY_POINTS))))
+          ((equal "Field Goal Percentage" (assoc-default 'title x)) (print (format-message "Field Goal Percentage: %S" (funcall type x 'FG_PCT))))
+          ((equal "Three Point Percentage" (assoc-default 'title x)) (print (format-message "Three Point Percentage: %S" (funcall type x 'FG3_PCT))))
+          ((equal "Free Throw Percentage" (assoc-default 'title x)) (print (format-message "Free Throw Percentage: %S" (funcall type x 'FT_PCT)))))))
 
 
 (defun list-player-stats (data stat-type)
@@ -152,7 +160,6 @@ Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE
                  (get-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-player-stats))))
    :error (message "Error Making HTTP Request")))
 
-
 (defun nba-daily-team ()
   "Return all the daily leading team stats with respect to the stat-type."
   (interactive)
@@ -165,8 +172,6 @@ Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE
                (with-output-to-temp-buffer "*nba-daily-team-stats*"
                  (get-data (assoc-default 'items (aref (assoc-default 'items data) 1)) 'list-team-stats))))
    :error (message "Error Making HTTP Request")))
-
-
 
 (defun nba-season-player ()
   "Return all the season leading player stats with respect to the stat-type."
@@ -181,6 +186,18 @@ Lists the team names (as DATA) & stat-value depending on Stat-Type (as STAT-TYPE
                  (get-data (assoc-default 'items (aref (assoc-default 'items data) 0)) 'list-player-stats))))
    :error (message "Error Making HTTP Request")))
 
+(defun nba-season-team ()
+  "Return all the season leading player stats with respect to the stat-type."
+  (interactive)
+  (request
+   "http://stats.nba.com/js/data/widgets/home_season.json"
+   :type "GET"
+   :parser 'json-read
+   :success (cl-function
+             (lambda (&key data &allow-other-keys)
+               (with-output-to-temp-buffer "*nba-season-team-stats*"
+                 (get-data (assoc-default 'items (aref (assoc-default 'items data) 1)) 'list-team-stats))))
+   :error (message "Error Making HTTP Request")))
 
 
 
