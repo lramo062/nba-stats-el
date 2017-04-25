@@ -24,7 +24,7 @@ Depends on request.el & json.el
 
 ### Installing
 
-Clone https://github.com/lramo062/nba-scores-stats and require nbaScores.el in your .emacs
+Clone https://github.com/lramo062/nba-scores-stats and require nba-stats.el in your .emacs
 
 
 ## Todo
