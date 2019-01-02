@@ -63,13 +63,13 @@
   "Return the NBA Scores for a given Date (as DATE)."
   (interactive "sEnter date YYYYMMDD:")
   (request
-   (concat "http://data.nba.net/data/10s/prod/v1/" date "/scoreboard.json")
+   (concat "http://data.nba.net/json/cms/noseason/scoreboard/" date "/games.json")
    :type "GET"
    :parser 'json-read
    :success (cl-function
              (lambda (&key data &allow-other-keys)
                (with-output-to-temp-buffer "*nba-scores*"
-                 (fetch-games (assoc-default 'games data))
+                 (fetch-games (assoc-default 'game (assoc-default 'games (assoc-default 'sports_content data))))
                  (switch-to-buffer "*nba-scores*"))))
    :error (message "Error Making HTTP Request")))
 
@@ -80,14 +80,13 @@
   (seq-doseq (x games)
     (print (format-message "%s: %s\n %s: %s"
                            ;; Home Team Name
-                           (assoc-default 'triCode (fetch-team x 'hTeam))
+                           (assoc-default 'nickname (assoc-default 'home x))
                            ;; Home Team Score
-                           (sum-score (assoc-default 'linescore (fetch-team x 'hTeam)))
+                           (assoc-default 'score (assoc-default 'home x))
                            ;; Visiting Team Name
-                           (assoc-default 'triCode (fetch-team x 'vTeam))
+                           (assoc-default 'nickname (assoc-default 'visitor x))
                            ;; Visiting Team Score
-                           (sum-score (assoc-default 'linescore (fetch-team x 'vTeam)))))))
-
+                           (assoc-default 'score (assoc-default 'visitor x))))))
 
 
 (defun sum-score (line-score)
