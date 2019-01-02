@@ -61,7 +61,9 @@
 
 (defun nba-scores (date)
   "Return the NBA Scores for a given Date (as DATE)."
-  (interactive "sEnter date YYYYMMDD:")
+  (interactive (list (read-string (format "Enter date YYYYMMDD: (%s): "
+                                          (format-time-string "%Y%m%d"))
+                                  nil nil (format-time-string "%Y%m%d"))))
   (request
    (concat "http://data.nba.net/json/cms/noseason/scoreboard/" date "/games.json")
    :type "GET"
