@@ -80,7 +80,7 @@
 (defun fetch-games (games)
   "Prints team name and score for each game (as GAMES)."
   (seq-doseq (x games)
-    (print (format-message "%s: %s\n %s: %s"
+    (print (format-message "%s: %s\n %s: %s\n time: %s"
                            ;; Home Team Name
                            (assoc-default 'nickname (assoc-default 'home x))
                            ;; Home Team Score
@@ -88,7 +88,10 @@
                            ;; Visiting Team Name
                            (assoc-default 'nickname (assoc-default 'visitor x))
                            ;; Visiting Team Score
-                           (assoc-default 'score (assoc-default 'visitor x))))))
+                           (assoc-default 'score (assoc-default 'visitor x))
+                           ;; Time
+                           (assoc-default 'time x)
+                           ))))
 
 
 (defun sum-score (line-score)
